@@ -1,10 +1,10 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
+// import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import FormControlLabel from '@mui/material/FormControlLabel';
+// import Divider from '@mui/material/Divider';
+// import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
@@ -14,8 +14,29 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import getSignUpTheme from './theme/getSignUpTheme';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
+// import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
 import TemplateFrame from './TemplateFrame';
+import { useNavigate } from 'react-router-dom';
+// APOLLO CLIENT
+import { useMutation, gql } from '@apollo/client';
+
+const CREATE_USER = gql`
+mutation CreateUser($nombre: String!, $email: String!, $password: String!) {
+  register(
+    createUserDto: {
+      nombre: $nombre
+      email: $email
+      password: $password
+    }
+  ) {
+    id
+    nombre
+    email
+    password
+  }
+}`
+
+
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -52,6 +73,13 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignUp() {
+  const navigate = useNavigate();
+  // console.log(window.localStorage.getItem('loginId'))
+  React.useEffect(() => {
+    if (window.localStorage.getItem('loginId')) {
+      navigate("/");}
+  },[navigate]);
+
   const [mode, setMode] = React.useState('light');
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
   const defaultTheme = createTheme({ palette: { mode } });
@@ -62,7 +90,13 @@ export default function SignUp() {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  // This code only runs on the client side, to determine the system color preference
+  // FormControl< 
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  // Mutation
+  const [createUser] = useMutation(CREATE_USER);
+
   React.useEffect(() => {
     // Check if there is a preferred mode in localStorage
     const savedMode = localStorage.getItem('themeMode');
@@ -132,10 +166,20 @@ export default function SignUp() {
     const data = new FormData(event.currentTarget);
     console.log({
       name: data.get('name'),
-      lastName: data.get('lastName'),
       email: data.get('email'),
       password: data.get('password'),
     });
+    //se crea el usuario
+    createUser({
+      variables: {
+        nombre: name,
+        email: email,
+        password: password,
+      }
+    });
+    setName("")
+    setEmail("")
+    setPassword("")
   };
 
   return (
@@ -174,6 +218,7 @@ export default function SignUp() {
                   error={nameError}
                   helperText={nameErrorMessage}
                   color={nameError ? 'error' : 'primary'}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </FormControl>
               <FormControl>
@@ -189,6 +234,7 @@ export default function SignUp() {
                   error={emailError}
                   helperText={emailErrorMessage}
                   color={passwordError ? 'error' : 'primary'}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </FormControl>
               <FormControl>
@@ -205,6 +251,7 @@ export default function SignUp() {
                   error={passwordError}
                   helperText={passwordErrorMessage}
                   color={passwordError ? 'error' : 'primary'}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </FormControl>
               {/* <FormControlLabel
@@ -223,7 +270,7 @@ export default function SignUp() {
                 Already have an account?{' '}
                 <span>
                   <Link
-                    href="#"
+                    href="/login"
                     variant="body2"
                     sx={{ alignSelf: 'center' }}
                   >
@@ -232,7 +279,7 @@ export default function SignUp() {
                 </span>
               </Typography>
             </Box>
-            <Divider>
+            {/* <Divider>
               <Typography sx={{ color: 'text.secondary' }}>or</Typography>
             </Divider>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -244,15 +291,15 @@ export default function SignUp() {
               >
                 Sign up with Google
               </Button>
-              {/* <Button
+              <Button
                 fullWidth
                 variant="outlined"
                 onClick={() => alert('Sign up with Facebook')}
                 startIcon={<FacebookIcon />}
               >
                 Sign up with Facebook
-              </Button> */}
-            </Box>
+              </Button>
+            </Box> */}
           </Card>
         </SignUpContainer>
       </ThemeProvider>

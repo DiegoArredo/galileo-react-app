@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Divider from '@mui/material/Divider';
+// import Divider from '@mui/material/Divider';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
@@ -14,10 +14,26 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from './ForgotPassword';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
+// import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
 import AppTheme from '../shared-theme/AppTheme';
-import ColorModeSelect from '../shared-theme/ColorModeSelect';
+// import ColorModeSelect from '../shared-theme/ColorModeSelect';
+import { useNavigate } from 'react-router-dom';
 
+//              APOLLO CLIENT
+import { useLazyQuery, gql } from '@apollo/client';
+
+const GET_LOGIN = gql`
+query GetLoginData($email: String!, $password: String!) {
+login(loginUserDto: { email: $email , password: $password }) {
+id
+nombre
+email
+isActive
+}
+}`
+
+
+//              STYLED COMPONENTS
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -60,63 +76,102 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn(props) {
+  const navigate = useNavigate();
+  console.log(window.localStorage.getItem('loginId'))
+  React.useEffect(() => {
+    if (window.localStorage.getItem('loginId')) {
+      navigate("/");}
+  },[navigate]);
+  // apollo client login graphql
+  const[getLoginData,result] = useLazyQuery(GET_LOGIN);
+  const[loginResult, setLoginResult] = React.useState(null);
+  // ------------------------------
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
-
+  // hook para manejar el resultado de la query
+  // React.useEffect(() => {
+  //   if (result) {
+  //     setLoginResult(result);
+  //   }
+  // }, [result]);
+// ------------------------------
   const handleClickOpen = () => {
     setOpen(true);
   };
-
+  
   const handleClose = () => {
     setOpen(false);
   };
-
+  
   const handleSubmit = (event) => {
     if (emailError || passwordError) {
       event.preventDefault();
       return;
     }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    console.log(window.localStorage.getItem('loginId'))
+    
   };
-
   const validateInputs = () => {
+    
     const email = document.getElementById('email');
     const password = document.getElementById('password');
-
     let isValid = true;
+    setEmailError(false);
+    setPasswordError(false);
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
       setEmailErrorMessage('Please enter a valid email address.');
       isValid = false;
+      return isValid;
     } else {
       setEmailError(false);
       setEmailErrorMessage('');
     }
-
-    if (!password.value || password.value.length < 6) {
+    
+    if (!password.value || password.value.length < 3) {
       setPasswordError(true);
       setPasswordErrorMessage('Password must be at least 6 characters long.');
       isValid = false;
+      return isValid;
     } else {
       setPasswordError(false);
       setPasswordErrorMessage('');
     }
-
+    console.log("Consulta al servidor ")
+    getLoginData({ variables: { email: email.value, password: password.value } });
+    console.log(result)
+    // console.log(loginResult)
+    if (result.error) {
+      console.log("Error en la consulta: ")
+      console.log(result.error.message)
+      if (result.error.message === "No se encontro usuario") {
+        setEmailError(true);
+        setEmailErrorMessage("Este email no esta registrado")
+      }else if(result.error.message === "Contraseña incorrecta"){
+        setPasswordError(true);
+        setPasswordErrorMessage("Contraseña incorrecta")
+      }
+    }
+    if (result.data) {
+      console.log("Resultado de la consulta: ")
+      console.log(result.data)
+      window.localStorage.setItem('loginId', result.data.login.id);
+    }
+    console.log(window.localStorage.getItem('loginId'))
+    setEmailError(true);
+    isValid = false;
     return isValid;
   };
-
+  
+  
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
-      <SignInContainer direction="column" justifyContent="space-between">
+      <SignInContainer direction="column" justifyContent="space-between" style={{padding:"25vh"}}>
         {/* <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} /> */}
         <Card variant="outlined">
           {/* <SitemarkIcon /> */}
@@ -128,7 +183,7 @@ export default function SignIn(props) {
             Sign in
           </Typography>
           <Box
-            component="form"
+            component={'form'}
             onSubmit={handleSubmit}
             noValidate
             sx={{
@@ -201,7 +256,7 @@ export default function SignIn(props) {
               Don&apos;t have an account?{' '}
               <span>
                 <Link
-                  href="#"
+                  href="/register"
                   variant="body2"
                   sx={{ alignSelf: 'center' }}
                 >
@@ -209,25 +264,6 @@ export default function SignIn(props) {
                 </Link>
               </span>
             </Typography>
-          </Box>
-          <Divider>or</Divider>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert('Sign in with Google')}
-              startIcon={<GoogleIcon />}
-            >
-              Sign in with Google
-            </Button>
-            {/* <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert('Sign in with Facebook')}
-              startIcon={<FacebookIcon />}
-            >
-              Sign in with Facebook
-            </Button> */}
           </Box>
         </Card>
       </SignInContainer>

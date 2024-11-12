@@ -12,6 +12,7 @@ import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 // import Sitemark from './SitemarkIcon';
+import { useNavigate } from 'react-router-dom';
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'flex',
@@ -29,11 +30,25 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
 
 export default function AppAppBar() {
   const [open, setOpen] = React.useState(false);
+  const navigate = useNavigate(); 
 
+  const goToRegister = () => {
+    navigate('/register');
+  };
+
+  const goToLogin = () => {
+    navigate('/login');
+  };
+  
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
+  const logout = () => {
+    window.localStorage.removeItem('loginId');
+    navigate('/login');
+  };
+  
   return (
     <AppBar
       position="fixed"
@@ -53,7 +68,7 @@ export default function AppAppBar() {
               <Button variant="text" color="info" size="small">
                 Perfil
               </Button>
-              <Button variant="text" color="info" size="small">
+              <Button variant="text" color="info" size="small" >
                 Carrito
               </Button>
             </Box>
@@ -65,11 +80,14 @@ export default function AppAppBar() {
               alignItems: 'center',
             }}
           >
-            <Button color="primary" variant="text" size="small">
+            <Button color="primary" variant="text" size="small" onClick={goToLogin}>
               Sign in
             </Button>
-            <Button color="primary" variant="contained" size="small">
+            <Button color="primary" variant="contained" size="small" onClick={goToRegister}>
               Sign up
+            </Button>
+            <Button color="secondary" variant="contained" size="small" onClick={logout}>
+              Log Out
             </Button>
           </Box>
           <Box sx={{ display: { sm: 'flex', md: 'none' } }}>
