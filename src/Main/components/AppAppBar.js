@@ -68,7 +68,7 @@ export default function AppAppBar() {
               <Button variant="text" color="info" size="small">
                 Perfil
               </Button>
-              <Button variant="text" color="info" size="small" >
+              <Button variant="text" color="info" size="small" onClick={() => navigate('/shopingcart')}>
                 Carrito
               </Button>
             </Box>
