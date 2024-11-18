@@ -89,7 +89,7 @@ const Header = () => {
       </Drawer>
       <ParallaxHeader role="img" aria-label="Scenic mountain landscape">
         <HeaderContent>
-          <Typography variant="h1" component="h1" gutterBottom>
+          <Typography variant="h1" component="h1" mt={"1vw"} gutterBottom>
             Galileo e-Learning
           </Typography>
           {/* <Typography variant="h5" component="h2" gutterBottom>

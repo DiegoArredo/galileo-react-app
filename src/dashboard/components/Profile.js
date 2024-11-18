@@ -1,136 +1,206 @@
-import * as React from 'react';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
-import Grid from '@mui/material/Grid2';
-import OutlinedInput from '@mui/material/OutlinedInput';
-import { styled } from '@mui/system';
+import * as React from "react";
+import Grid from "@mui/material/Grid2";
+import { styled } from "@mui/system";
+import { FormControl, FormLabel, TextField } from "@mui/material";
+import Button from "@mui/material/Button";
+import { useState,useEffect } from "react";
+// APOLLO GRAPHQL
+import { useMutation, gql, ApolloClient, InMemoryCache } from "@apollo/client";
+
+const userClient = new ApolloClient({
+  uri: 'http://localhost:3001/graphql',
+  cache: new InMemoryCache()
+});
+
+const UPDATE_USER = gql`
+mutation updateUser($id: Int!, $nombre: String, $email: String, $password: String, $pais: String, $genero: String, $descripcion: String, $profesion: String) {
+  updateUserProfile(
+    id: $id,
+    updateUserDto: {
+      nombre: $nombre,
+      email: $email,
+      password: $password,
+      genero: $genero,
+      pais: $pais,
+      descripcion: $descripcion,
+      profesion: $profesion,
+    }
+  ) {
+    id
+    nombre
+    email
+    password
+    pais
+    genero
+    descripcion
+    profesion
+  }
+}
+`;
+
 
 const FormGrid = styled(Grid)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
+  display: "flex",
+  flexDirection: "column",
 }));
 
 export default function Profile() {
+  const [loginData, setLoginData] = useState(
+    JSON.parse(window.localStorage.getItem("loginData"))
+  );
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+
+  const validateUpdate = (event) => {
+    const { name, value } = event.target;
+    if (loginData[name] === value) {
+      setButtonDisabled(true);
+    } else {
+      if (loginData[name] === null && value === "") {
+        setButtonDisabled(true);
+      } else {
+        setButtonDisabled(false);
+      }
+    }
+  };
+
+  const [updateUser, { data, loading, error }] = useMutation(UPDATE_USER, {client: userClient});
+  useEffect(() => {
+    if (loading) {
+      console.log("Loading");
+    }
+    if (error) {
+      console.log("Error");
+    }
+    if (data) {
+      console.log("Data");
+      console.log(data);
+      console.log("User profile updated: ", data.updateUserProfile);
+      window.localStorage.setItem("loginData", JSON.stringify(data.updateUserProfile));
+      setLoginData(data.updateUserProfile);
+      setButtonDisabled(true);
+    }
+  }, [data, loading, error]);
+
+  const handleSubmit = (event) => {
+    console.log("Submit");
+    const nombre = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const descripcion = document.getElementById("descripcion").value;
+    const pais = document.getElementById("pais").value;
+    const genero = document.getElementById("genero").value;
+    
+    updateUser({
+      variables: {
+        id: loginData.id,
+        nombre: nombre,
+        email: email,
+        descripcion: descripcion,
+        pais: pais,
+        genero: genero,
+      },
+    });
+    event.preventDefault();
+  }
+
   return (
-    <Grid container spacing={3}>
-        
+    <Grid
+      component={"form"}
+      onSubmit={handleSubmit}
+      noValidate
+      container
+      spacing={3}
+      paddingX={"5vw"}
+      paddingTop={"3vh"}
+      justifyContent={"end"}
+    >
       <FormGrid size={{ xs: 12, md: 6 }}>
-        <FormLabel htmlFor="first-name" required>
-          First name
-        </FormLabel>
-        <OutlinedInput
-          id="first-name"
-          name="first-name"
-          type="name"
-          placeholder="John"
-          autoComplete="first name"
-          required
-          size="small"
-        />
+        <FormControl>
+          <FormLabel htmlFor="name" required>
+            Nombre
+          </FormLabel>
+          <TextField
+            id="name"
+            name="nombre"
+            type="name"
+            placeholder="John"
+            defaultValue={loginData.nombre}
+            required
+            size="small"
+            onChange={validateUpdate}
+          />
+        </FormControl>
       </FormGrid>
       <FormGrid size={{ xs: 12, md: 6 }}>
-        <FormLabel htmlFor="last-name" required>
-          Last name
-        </FormLabel>
-        <OutlinedInput
-          id="last-name"
-          name="last-name"
-          type="last-name"
-          placeholder="Snow"
-          autoComplete="last name"
-          required
-          size="small"
-        />
+        <FormControl>
+          <FormLabel htmlFor="email" required>
+            Email
+          </FormLabel>
+          <TextField
+            id="email"
+            name="email"
+            type="email"
+            placeholder="ejemplo@email.com"
+            defaultValue={loginData.email}
+            required
+            size="small"
+            onChange={validateUpdate}
+          />
+        </FormControl>
       </FormGrid>
       <FormGrid size={{ xs: 12 }}>
-        <FormLabel htmlFor="address1" required>
-          Address line 1
-        </FormLabel>
-        <OutlinedInput
-          id="address1"
-          name="address1"
-          type="address1"
-          placeholder="Street name and number"
-          autoComplete="shipping address-line1"
-          required
-          size="small"
-        />
+        <FormControl>
+          <FormLabel htmlFor="descripcion" required>
+            Descripcion
+          </FormLabel>
+          <TextField
+            id="descripcion"
+            name="descripcion"
+            type="descripcion"
+            placeholder="Agrega una descripcion a tu perfil."
+            defaultValue={loginData.descripcion}
+            required
+            size="small"
+            onChange={validateUpdate}
+          />
+        </FormControl>
       </FormGrid>
-      <FormGrid size={{ xs: 12 }}>
-        <FormLabel htmlFor="address2">Address line 2</FormLabel>
-        <OutlinedInput
-          id="address2"
-          name="address2"
-          type="address2"
-          placeholder="Apartment, suite, unit, etc. (optional)"
-          autoComplete="shipping address-line2"
-          required
-          size="small"
-        />
+      <FormGrid size={{ xs: 12, md: 6 }}>
+        <FormControl>
+          <FormLabel htmlFor="pais" required>
+            País
+          </FormLabel>
+          <TextField
+            id="pais"
+            name="pais"
+            type="pais"
+            placeholder="Agrega tu pais"
+            defaultValue={loginData.pais}
+            required
+            size="small"
+            onChange={validateUpdate}
+          />
+        </FormControl>
       </FormGrid>
-      <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="city" required>
-          City
-        </FormLabel>
-        <OutlinedInput
-          id="city"
-          name="city"
-          type="city"
-          placeholder="New York"
-          autoComplete="City"
-          required
-          size="small"
-        />
+      <FormGrid size={{ xs: 12, md: 6 }}>
+        <FormControl>
+          <FormLabel htmlFor="genero" required>
+            Género
+          </FormLabel>
+          <TextField
+            id="genero"
+            name="genero"
+            type="genero"
+            placeholder="Escribe tu género"
+            defaultValue={loginData.genero}
+            required
+            size="small"
+            onChange={validateUpdate}
+          />
+        </FormControl>
       </FormGrid>
-      <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="state" required>
-          State
-        </FormLabel>
-        <OutlinedInput
-          id="state"
-          name="state"
-          type="state"
-          placeholder="NY"
-          autoComplete="State"
-          required
-          size="small"
-        />
-      </FormGrid>
-      <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="zip" required>
-          Zip / Postal code
-        </FormLabel>
-        <OutlinedInput
-          id="zip"
-          name="zip"
-          type="zip"
-          placeholder="12345"
-          autoComplete="shipping postal-code"
-          required
-          size="small"
-        />
-      </FormGrid>
-      <FormGrid size={{ xs: 6 }}>
-        <FormLabel htmlFor="country" required>
-          Country
-        </FormLabel>
-        <OutlinedInput
-          id="country"
-          name="country"
-          type="country"
-          placeholder="United States"
-          autoComplete="shipping country"
-          required
-          size="small"
-        />
-      </FormGrid>
-      {/* <FormGrid size={{ xs: 12 }}>
-        <FormControlLabel
-          control={<Checkbox name="saveAddress" value="yes" />}
-          label="Use this address for payment details"
-        />
-      </FormGrid> */}
+      <Button id="submitButton" type="submit" color="secondary" variant="contained" disabled={buttonDisabled} loginid={loginData.id}>
+        Guardar
+      </Button>
     </Grid>
   );
 }

@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs, { breadcrumbsClasses } from '@mui/material/Breadcrumbs';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
-
+import { useLocation } from 'react-router-dom';
 const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
   margin: theme.spacing(1, 0),
   [`& .${breadcrumbsClasses.separator}`]: {
@@ -15,26 +15,10 @@ const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
   },
 }));
 
-const data = [
-  {
-    href: '/#',
-    name: 'Mi Cuenta',
-  },
-  {
-    href: '/#',
-    name: 'Mis Cursos',
-  },
-  {
-    href: '/#',
-    name: 'Perfil',
-  },
-  {
-    href: '/#',
-    name: 'Historial de Compras',
-  }
-]
 
 export default function NavbarBreadcrumbs() {
+  const location = useLocation(); 
+
   return (
     <StyledBreadcrumbs
       aria-label="breadcrumb"
@@ -42,7 +26,7 @@ export default function NavbarBreadcrumbs() {
     >
       <Typography variant="body1">Mi Cuenta</Typography>
       <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 600 }}>
-        {data[1].name}
+        {location.pathname === '/dashboard/perfil' ? 'Perfil' : location.pathname === '/dashboard/compras' ? 'Historial de Compras' : location.pathname === '/dashboard/cursos' ? 'Mis Cursos' : 'Dashboard'}
       </Typography>
     </StyledBreadcrumbs>
   );

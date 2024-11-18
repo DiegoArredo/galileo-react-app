@@ -10,7 +10,10 @@ import SelectContent from './SelectContent';
 import MenuContent from './MenuContent';
 import CardAlert from './CardAlert';
 import OptionsMenu from './OptionsMenu';
-
+import { useState } from 'react';
+import { IconButton } from '@mui/material';
+import HomeIcon from '@mui/icons-material/Home';
+import { useNavigate } from 'react-router-dom';
 const drawerWidth = 240;
 
 const Drawer = styled(MuiDrawer)({
@@ -25,6 +28,13 @@ const Drawer = styled(MuiDrawer)({
 });
 
 export default function SideMenu() {
+  const [loginData, setLoginData] = useState(
+    JSON.parse(window.localStorage.getItem("loginData"))
+  );
+  const navigate = useNavigate();
+  const goHome = () => {
+    navigate("/");
+  }
   return (
     <Drawer
       variant="permanent"
@@ -42,8 +52,8 @@ export default function SideMenu() {
           p: 1.5,
         }}
       >
-        {/* <SelectContent /> */}
-        <Typography variant="h6">Mi Cuenta</Typography>
+ 
+        <Typography variant="h5">Mi Cuenta</Typography>
       </Box>
       <Divider />
       <MenuContent />
@@ -60,16 +70,16 @@ export default function SideMenu() {
       >
         <Avatar
           sizes="small"
-          alt="Usuario Test"
+          alt={loginData.nombre}
           src="/static/images/avatar/7.jpg"
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            Usuario
+            {loginData.nombre}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            user@email.com
+            {loginData.email}
           </Typography>
         </Box>
         <OptionsMenu />

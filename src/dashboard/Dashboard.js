@@ -17,6 +17,7 @@ import {
   datePickersCustomizations,
   treeViewCustomizations,
 } from './theme/customizations';
+import { Routes, Route } from 'react-router-dom';
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -53,8 +54,11 @@ export default function Dashboard(props) {
             }}
           >
             <Header />
-            {/* ESTE VA CAMBIANDO */}
-            <Compras />
+            <Routes>
+              <Route path="/perfil" element={<Profile/>} />
+              <Route path="/compras" element={<Compras />} />
+              <Route path="/cursos" element={<Cursos />} />
+            </Routes>
           </Stack>
         </Box>
       </Box>
