@@ -11,6 +11,7 @@ import Header from './components/Header';
 
 
 import getBlogTheme from './theme/getBlogTheme';
+import ChatButton from '../botAi/botAi';
 
 export default function Main() {
   const [mode, setMode] = React.useState('light');
@@ -63,6 +64,7 @@ export default function Main() {
         </Container>
         <Footer />
       </ThemeProvider>
+      <ChatButton />
     </TemplateFrame>
   );
 }
