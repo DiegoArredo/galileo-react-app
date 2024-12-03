@@ -31,6 +31,15 @@ export default function SideMenu() {
   const [loginData, setLoginData] = useState(
     JSON.parse(window.localStorage.getItem("loginData"))
   );
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  React.useEffect(() => {
+    if (loginData) {
+      setNombre(loginData.nombre);
+      setEmail(loginData.email);
+    }
+  }, [loginData]);
+  
   const navigate = useNavigate();
   const goHome = () => {
     navigate("/");
@@ -70,16 +79,16 @@ export default function SideMenu() {
       >
         <Avatar
           sizes="small"
-          alt={loginData.nombre}
+          alt={nombre}
           src="/static/images/avatar/7.jpg"
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            {loginData.nombre}
+            {nombre}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            {loginData.email}
+            {email}
           </Typography>
         </Box>
         <OptionsMenu />

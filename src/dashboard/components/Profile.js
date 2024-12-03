@@ -46,10 +46,13 @@ const FormGrid = styled(Grid)(() => ({
 
 export default function Profile() {
   const [loginData, setLoginData] = useState(
-    JSON.parse(window.localStorage.getItem("loginData"))
+    JSON.parse(localStorage.getItem("loginData"))
   );
+
   const [buttonDisabled, setButtonDisabled] = useState(true);
 
+  
+  
   const validateUpdate = (event) => {
     const { name, value } = event.target;
     if (loginData[name] === value) {
@@ -83,20 +86,15 @@ export default function Profile() {
 
   const handleSubmit = (event) => {
     console.log("Submit");
-    const nombre = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const descripcion = document.getElementById("descripcion").value;
-    const pais = document.getElementById("pais").value;
-    const genero = document.getElementById("genero").value;
     
     updateUser({
       variables: {
         id: loginData.id,
-        nombre: nombre,
-        email: email,
-        descripcion: descripcion,
-        pais: pais,
-        genero: genero,
+        nombre: loginData.nombre,
+        email: loginData.email,
+        descripcion: loginData.descripcion,
+        pais: loginData.pais,
+        genero: loginData.genero,
       },
     });
     event.preventDefault();
@@ -115,7 +113,7 @@ export default function Profile() {
     >
       <FormGrid size={{ xs: 12, md: 6 }}>
         <FormControl>
-          <FormLabel htmlFor="name" required>
+          <FormLabel htmlFor="name" >
             Nombre
           </FormLabel>
           <TextField

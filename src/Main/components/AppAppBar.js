@@ -16,6 +16,8 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { useNavigate } from "react-router-dom";
 import { Icon, Typography } from "@mui/material";
 import PsychologyIcon from "@mui/icons-material/Psychology";
+import { Link } from "react-router-dom";
+import Badge from "@mui/material/Badge";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -56,6 +58,13 @@ export default function AppAppBar() {
     navigate(`/dashboard/${path}`);
   };
 
+  const handleCarrito = () => {
+    navigate("/carrito");
+  };
+  const [carritoCantidad, setCarritoCantidad] = React.useState(localStorage.getItem("carritoItems"));
+  React.useEffect(() => {
+    setCarritoCantidad(localStorage.getItem("carritoItems"));
+  }, [localStorage.getItem("carritoItems")]);
   return (
     <AppBar
       position="fixed"
@@ -78,27 +87,43 @@ export default function AppAppBar() {
           >
             {/* <Sitemark /> */}
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <IconButton color="info" disabled>
+              <Button onClick={() => navigate("/")}>
                 <PsychologyIcon />
-              </IconButton>
-              <Typography
-                variant="h5"
-                component="div"
-                alignSelf={"center"}
-                px={"1vh"}
-              >
-                Galileo Learning
-              </Typography>
+
+                <Typography
+                  variant="h5"
+                  component="div"
+                  alignSelf={"center"}
+                  px={"1vh"}
+                >
+                  Galileo Learning
+                </Typography>
+              </Button>
 
               {localStorage.getItem("loginData") && (
                 <>
-                  <Button  variant="text" color="info" size="small" onClick={handleNavigate("cursos")}>
+                  <Button
+                    variant="text"
+                    color="info"
+                    size="small"
+                    onClick={handleNavigate("cursos")}
+                  >
                     Cursos
                   </Button>
-                  <Button variant="text" color="info" size="small" onClick={handleNavigate("perfil")}>
+                  <Button
+                    variant="text"
+                    color="info"
+                    size="small"
+                    onClick={handleNavigate("perfil")}
+                  >
                     Perfil
                   </Button>
-                  <Button variant="text" color="info" size="small" onClick={handleNavigate("compras")}>
+                  <Button
+                    variant="text"
+                    color="info"
+                    size="small"
+                    onClick={handleNavigate("compras")}
+                  >
                     Historial Compra
                   </Button>
                 </>
@@ -112,8 +137,10 @@ export default function AppAppBar() {
               alignItems: "center",
             }}
           >
-            <IconButton color="info" onClick={toggleDrawer(false)}>
-              <ShoppingCartIcon />
+            <IconButton aria-label="cart"  onClick={handleCarrito}>
+              <Badge badgeContent={carritoCantidad} color="warning">
+                <ShoppingCartIcon />
+              </Badge>
             </IconButton>
 
             {!localStorage.getItem("loginData") ? (
@@ -145,7 +172,6 @@ export default function AppAppBar() {
                 Log Out
               </Button>
             )}
-
           </Box>
           <Box
             sx={{
@@ -155,9 +181,20 @@ export default function AppAppBar() {
               px: 0,
             }}
           >
-            <Typography variant="h6" component="div" pl={"1vw"}>
-              GalileoLogo
-            </Typography>
+            <Box display={"flex"}>
+              <IconButton color="info" disabled>
+                <PsychologyIcon />
+              </IconButton>
+
+              <Typography
+                variant="h5"
+                component="div"
+                alignSelf={"center"}
+                px={"1vh"}
+              >
+                Galileo Learning
+              </Typography>
+            </Box>
           </Box>
           <Box sx={{ display: { sm: "flex", md: "none" } }}>
             <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
@@ -177,32 +214,52 @@ export default function AppAppBar() {
                   </IconButton>
                 </Box>
                 <Divider sx={{ my: 3 }} />
-                <MenuItem>Features</MenuItem>
+
+                <MenuItem onClick={handleNavigate("cursos")}>Cursos</MenuItem>
+                <MenuItem onClick={handleNavigate("perfil")}>Perfil</MenuItem>
+                <MenuItem onClick={handleNavigate("compras")}>
+                  Historial de Compra
+                </MenuItem>
                 <MenuItem>
-                  <IconButton onClick={toggleDrawer(false)}>
+                  <IconButton onClick={handleCarrito}>
                     <ShoppingCartIcon />
                   </IconButton>
                 </MenuItem>
-                <MenuItem>
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    fullWidth
-                    onClick={goToRegister}
-                  >
-                    Sign up
-                  </Button>
-                </MenuItem>
-                <MenuItem>
-                  <Button
-                    color="primary"
-                    variant="outlined"
-                    fullWidth
-                    onClick={goToLogin}
-                  >
-                    Sign in
-                  </Button>
-                </MenuItem>
+                {!localStorage.getItem("loginData") ? (
+                  <>
+                    <MenuItem>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        fullWidth
+                        onClick={goToRegister}
+                      >
+                        Sign up
+                      </Button>
+                    </MenuItem>
+                    <MenuItem>
+                      <Button
+                        color="primary"
+                        variant="outlined"
+                        fullWidth
+                        onClick={goToLogin}
+                      >
+                        Sign in
+                      </Button>
+                    </MenuItem>
+                  </>
+                ) : (
+                  <MenuItem>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      fullWidth
+                      onClick={logout}
+                    >
+                      Log Out
+                    </Button>
+                  </MenuItem>
+                )}
               </Box>
             </Drawer>
           </Box>

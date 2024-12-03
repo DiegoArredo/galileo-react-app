@@ -17,7 +17,7 @@ import {
   datePickersCustomizations,
   treeViewCustomizations,
 } from './theme/customizations';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -27,6 +27,13 @@ const xThemeComponents = {
 };
 
 export default function Dashboard(props) {
+  const navigate = useNavigate();
+  React.useEffect (() => {
+    if (!localStorage.getItem("loginData")) {
+      navigate("/");
+    }
+  },[navigate]);
+
   return (
     <AppTheme {...props} themeComponents={xThemeComponents}>
       <CssBaseline enableColorScheme />
@@ -54,11 +61,13 @@ export default function Dashboard(props) {
             }}
           >
             <Header />
-            <Routes>
-              <Route path="/perfil" element={<Profile/>} />
-              <Route path="/compras" element={<Compras />} />
-              <Route path="/cursos" element={<Cursos />} />
-            </Routes>
+            {localStorage.getItem("loginData") && (
+              <Routes>
+                <Route path="/perfil" element={<Profile />} />
+                <Route path="/compras" element={<Compras />} />
+                <Route path="/cursos" element={<Cursos />} />
+              </Routes>
+            )}
           </Stack>
         </Box>
       </Box>
