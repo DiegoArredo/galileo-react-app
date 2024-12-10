@@ -14,6 +14,7 @@ import getCheckoutTheme from "../checkout/theme/getCheckoutTheme";
 import TemplateFrame from "../checkout/TemplateFrame";
 import AppAppBar from "../Main/components/AppAppBar";
 import CursoCard from "./CursoCard";
+import { useNavigate } from "react-router-dom";
 // Apollo
 
 //MICROSERVICIO DE CARRITO
@@ -124,10 +125,16 @@ export default function Cart() {
   React.useEffect(() => {
     console.log("Cursos en carrito: ", cursosEnCarrito);
   }, [cursosEnCarrito]);
+
+  //MANEJA LA ELIMINACION DE CURSOS EN EL CARRITO!
+//ACTUALIZAR CACHE! Falta eso
   const handleCursoEliminado = (idCurso) => {
     setCursosEnCarrito((prev) => prev.filter((curso) => curso.idCurso !== idCurso));
   }
-
+  const navigate = useNavigate();
+  const handlePagar = () => {
+    navigate("/checkout");
+  }
 
   //Themes
   const [mode, setMode] = React.useState("light");
@@ -157,6 +164,7 @@ export default function Cart() {
   const toggleCustomTheme = () => {
     setShowCustomTheme((prev) => !prev);
   };
+
 
   return (
     <TemplateFrame
@@ -257,6 +265,7 @@ export default function Cart() {
                 fullWidth
                 sx={{ p: "4vh", mt: "1vh" }}
                 carritoid={carritoId}
+                onClick={handlePagar}
               >
                 <Typography variant="h5">Pagar</Typography>
               </Button>

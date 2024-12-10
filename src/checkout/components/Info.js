@@ -5,31 +5,74 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
+import CursoListItem from './CursoListItem';
 
-const products = [
-  {
-    name: 'Professional plan',
-    desc: 'Monthly subscription',
-    price: '$15.00',
-  },
-  {
-    name: 'Dedicated support',
-    desc: 'Included in the Professional plan',
-    price: 'Free',
-  },
-  {
-    name: 'Hardware',
-    desc: 'Devices needed for development',
-    price: '$69.99',
-  },
-  {
-    name: 'Landing page template',
-    desc: 'License',
-    price: '$49.99',
-  },
-];
+// Apollo
 
-function Info({ totalPrice }) {
+//MICROSERVICIO DE CARRITO
+import {
+  useQuery,
+  gql,
+  ApolloClient,
+  InMemoryCache,
+  useMutation,
+  useLazyQuery,
+} from "@apollo/client";
+
+const carritoClient = new ApolloClient({
+  uri: "http://localhost:3003/graphql",
+  cache: new InMemoryCache(),
+});
+
+//LAZY QUERY PARA OBTENER LOS CURSOS DEL CARRITO
+const GET_CURSOS_CARRITO = gql`
+  query getCursosEnCarrito($idCarrito: Int!) {
+    getCursosEnCarrito(idCarrito: $idCarrito) {
+      id
+      idCarrito
+      idCurso
+    }
+  }
+`;
+
+
+function Info({ idCarrito,totalPrice}) {
+  const [cursosEnCarrito, setCursosEnCarrito] = React.useState([]);
+  //QUERY PARA OBTENER LOS CURSOS DEL CARRITO
+  const [
+    getCursosEnCarrito,
+    {
+      loading: loadingCursosCarrito,
+      error: errorCursosCarrito,
+      data: dataCursosCarrito,
+    },
+  ] = useLazyQuery(GET_CURSOS_CARRITO, { client: carritoClient });
+  React.useEffect(() => {
+    if (loadingCursosCarrito) {
+      console.log("Loading cursos carrito...");
+    }
+    if (errorCursosCarrito) {
+      console.log("Error en la consulta: ");
+      console.log(errorCursosCarrito.message);
+    }
+    if (dataCursosCarrito) {
+      console.log("Data cursos carrito");
+      console.log(dataCursosCarrito);
+      setCursosEnCarrito(dataCursosCarrito.getCursosEnCarrito);
+      console.log(
+        "Cursos en carrito: \n",
+        dataCursosCarrito.getCursosEnCarrito
+      );
+    }
+  }, [dataCursosCarrito, loadingCursosCarrito, errorCursosCarrito]);
+
+  React.useEffect(() => {
+    getCursosEnCarrito({
+      variables: { idCarrito: idCarrito },
+    });
+  }, []);
+
+
   return (
     <React.Fragment>
       <Typography variant="subtitle2" sx={{ color: 'text.secondary' }}>
@@ -39,17 +82,10 @@ function Info({ totalPrice }) {
         {totalPrice}
       </Typography>
       <List disablePadding>
-        {products.map((product) => (
-          <ListItem key={product.name} sx={{ py: 1, px: 0 }}>
-            <ListItemText
-              sx={{ mr: 2 }}
-              primary={product.name}
-              secondary={product.desc}
-            />
-            <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-              {product.price}
-            </Typography>
-          </ListItem>
+      {cursosEnCarrito &&
+        cursosEnCarrito.map((curso) => (
+          <CursoListItem idCurso={curso.idCurso}/>
+
         ))}
       </List>
     </React.Fragment>

@@ -7,8 +7,8 @@ import Stack from '@mui/material/Stack';
 import AppNavbar from './components/AppNavbar';
 import Header from './components/Header';
 import Cursos from './components/Cursos';
-import Compras from './components/Compras';
 import Profile from './components/Profile';
+import HistorialCompras from './components/HistorialCompras';
 import SideMenu from './components/SideMenu';
 import AppTheme from '../shared-theme/AppTheme';
 import {
@@ -64,7 +64,7 @@ export default function Dashboard(props) {
             {localStorage.getItem("loginData") && (
               <Routes>
                 <Route path="/perfil" element={<Profile />} />
-                <Route path="/compras" element={<Compras />} />
+                <Route path="/compras" element={<HistorialCompras />} />
                 <Route path="/cursos" element={<Cursos />} />
               </Routes>
             )}

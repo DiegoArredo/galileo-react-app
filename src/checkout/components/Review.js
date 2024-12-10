@@ -17,21 +17,23 @@ const payments = [
 ];
 
 export default function Review() {
+  // console.log(localStorage.getItem("montoCarrito"))
+  // console.log(localStorage.getItem("carritoItems"))
   return (
     <Stack spacing={2}>
       <List disablePadding>
         <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText primary="Products" secondary="4 selected" />
-          <Typography variant="body2">$134.98</Typography>
+          <ListItemText primary="Productos" secondary={localStorage.getItem("carritoItems") + " cursos seleccionados"} />
+          <Typography variant="body2">{"$ "+localStorage.getItem("montoCarrito")}</Typography>
         </ListItem>
         <ListItem sx={{ py: 1, px: 0 }}>
-          <ListItemText primary="Shipping" secondary="Plus taxes" />
-          <Typography variant="body2">$9.99</Typography>
+          <ListItemText primary="Descuentos" secondary="" />
+          <Typography variant="body2">- $0.00</Typography>
         </ListItem>
         <ListItem sx={{ py: 1, px: 0 }}>
           <ListItemText primary="Total" />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            $144.97
+            {"$ "+localStorage.getItem("montoCarrito")}
           </Typography>
         </ListItem>
       </List>
@@ -44,20 +46,20 @@ export default function Review() {
       >
         <div>
           <Typography variant="subtitle2" gutterBottom>
-            Shipment details
+            Detalles de envío:
           </Typography>
-          <Typography gutterBottom>John Smith</Typography>
+          <Typography gutterBottom>{localStorage.getItem("carritoItems") +" cursos con acceso completo:"}</Typography>
           <Typography gutterBottom sx={{ color: 'text.secondary' }}>
-            {addresses.join(', ')}
+           Seran agregados a su cuenta al fianlizar el pago.
           </Typography>
         </div>
         <div>
           <Typography variant="subtitle2" gutterBottom>
-            Payment details
+            Detalles del Pago:
           </Typography>
-          <Grid container>
-            {payments.map((payment) => (
-              <React.Fragment key={payment.name}>
+
+           
+              
                 <Stack
                   direction="row"
                   spacing={1}
@@ -65,13 +67,11 @@ export default function Review() {
                   sx={{ width: '100%', mb: 1 }}
                 >
                   <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                    {payment.name}
+                    Metodo Selecionado:
                   </Typography>
-                  <Typography variant="body2">{payment.detail}</Typography>
+                  <Typography variant="body2">WebPay</Typography>
                 </Stack>
-              </React.Fragment>
-            ))}
-          </Grid>
+
         </div>
       </Stack>
     </Stack>
