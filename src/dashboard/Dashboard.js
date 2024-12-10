@@ -8,6 +8,7 @@ import AppNavbar from './components/AppNavbar';
 import Header from './components/Header';
 import Cursos from './components/Cursos';
 import Profile from './components/Profile';
+import Payment from "./components/Payment"
 import HistorialCompras from './components/HistorialCompras';
 import SideMenu from './components/SideMenu';
 import AppTheme from '../shared-theme/AppTheme';
@@ -66,6 +67,7 @@ export default function Dashboard(props) {
                 <Route path="/perfil" element={<Profile />} />
                 <Route path="/compras" element={<HistorialCompras />} />
                 <Route path="/cursos" element={<Cursos />} />
+                <Route path="/payment/:status/:action" element={<Payment />} />
               </Routes>
             )}
           </Stack>
