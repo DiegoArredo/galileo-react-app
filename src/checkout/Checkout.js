@@ -59,6 +59,18 @@ const GET_CURSOS_CARRITO = gql`
   }
 `;
 
+//Marcar carrito como pendiente
+
+// Definir la mutación para marcar el carrito como pendiente
+const MARCAR_CARRITO_COMO_PENDIENTE = gql`
+  mutation marcarCarritoComoPendiente($idCarrito: Int!) {
+    marcarCarritoComoPendiente(idCarrito: $idCarrito) {
+      id
+      estado
+    }
+  }
+`;
+
 const steps = ["Detalles del pago", "Revisa tu orden"];
 function getStepContent(step) {
   switch (step) {
@@ -85,6 +97,8 @@ export default function Checkout() {
     getCarrito,
     { loading: loadingCarrito, error: errorCarrito, data: dataCarrito },
   ] = useLazyQuery(GET_CARRITO, { client: carritoClient });
+  //Marcar carrito como pendiente
+  const [marcarCarritoComoPendiente] = useMutation(MARCAR_CARRITO_COMO_PENDIENTE, { client: carritoClient });
 
   //MOSTRAR INFO DE LA QUERY
   React.useEffect(() => {
@@ -177,6 +191,52 @@ export default function Checkout() {
   const handlegotoorders = () => {
     navigate("/dashboard/compras");
   };
+
+  const handlePayment = async () => {
+    // Asegúrate de que `carritoId` esté definido y tenga un valor válido
+    console.log('carritoId:', carritoId);
+    if (!carritoId) {
+      alert('Carrito no definido');
+      return;
+    }
+
+    // Marcar carrito como pendiente
+    console.log('Marcando carrito como pendiente:', carritoId);
+    const result = await marcarCarritoComoPendiente({ variables: { idCarrito: carritoId } });
+    console.log('Resultado de marcarCarritoComoPendiente:', result);
+  
+    // Ejecuta la consulta para obtener los datos del carrito
+    const { data } = await getCarrito({ variables: { id: carritoId } });
+    console.log('getCarrito data:', data);
+  
+    if (!data || !data.getCarrito) {
+      alert('Error al obtener los datos del carrito');
+      return;
+    }
+  
+    // Asegúrate de que el monto sea un número entero
+    const amount = Math.round(data.getCarrito.monto);
+    const clienteId = data.getCarrito.idUsuario;
+    console.log('amount:', amount, 'clienteId:', clienteId);
+  
+    const response = await fetch('http://localhost:3003/webpay/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount, cliente_id: clienteId }),
+    });
+  
+    const dataResponse = await response.json();
+    console.log('dataResponse:', dataResponse);
+    if (dataResponse.status === 'OK') {
+      window.location.href = dataResponse.data.urlWebpay;
+    } else {
+      alert('Error al iniciar la transacción');
+    }
+  };
+
+
   return (
     <TemplateFrame
       toggleCustomTheme={toggleCustomTheme}
@@ -410,7 +470,7 @@ export default function Checkout() {
                     <Button
                       variant="contained"
                       endIcon={<ChevronRightRoundedIcon />}
-                      onClick={handleNext}
+                      onClick={activeStep === steps.length - 1 ? handlePayment : handleNext}
                       sx={{ width: { xs: "100%", sm: "fit-content" } }}
                     >
                       {activeStep === steps.length - 1 ? "Ir a Pagar" : "Siguiente"}
