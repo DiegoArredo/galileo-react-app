@@ -80,7 +80,6 @@ export default function Curso({ id, nombre, categoria, descripcion, precio, inst
                 variant="outlined"
                 onFocus={() => handleFocus(0)}
                 onBlur={handleBlur}
-                onClick={handleOpen}
                 tabIndex={0}
                 className={focusedCardIndex === 0 ? 'Mui-focused' : ''}
             >
@@ -93,6 +92,7 @@ export default function Curso({ id, nombre, categoria, descripcion, precio, inst
                         borderBottom: '1px solid',
                         borderColor: 'divider',
                     }}
+                    onClick={handleOpen}
                 />
                 <SyledCardContent>
                     <Typography gutterBottom variant="caption" component="div">
