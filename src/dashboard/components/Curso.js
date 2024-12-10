@@ -7,10 +7,63 @@ import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import { Button } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import { useQuery, gql, ApolloClient, InMemoryCache} from '@apollo/client';
+const cursoClient = new ApolloClient({
+  uri: 'http://localhost:3002/graphql',
+  cache: new InMemoryCache()
+});
+
+const GET_CURSOS_BY_ID = gql`
+query getCursoId($id: Int!) {
+  getCursoById(id: $id) {
+    id
+    nombre
+    descripcion
+    precio
+    rating
+    categoria
+    nivel
+    instructor
+    urlImagen
+  }
+}
+`
+export default function Curso({ idCurso }) {
+    const { loading: loadingCurso, error: errorCurso, data: dataCurso } = useQuery(GET_CURSOS_BY_ID, { client: cursoClient, variables: { id: idCurso } });
+    const [id, setId] = React.useState(idCurso);
+    const [nombre, setNombre] = React.useState("");
+    const [descripcion, setDescripcion] = React.useState("");
+    const [precio, setPrecio] = React.useState("");
+    const [rating, setRating] = React.useState("");
+    const [categoria, setCategoria] = React.useState("");
+    const [nivel, setNivel] = React.useState("");
+    const [instructor, setInstructor] = React.useState("");
+    const [urlimagen, setUrlImagen] = React.useState("");
+    const carritoId = localStorage.getItem("carritoId");
+
+    React.useEffect(() => {
+        if (loadingCurso) {
+          console.log("Loading curso", id, "...");
+        }
+        if (errorCurso) {
+          console.log("Error en la consulta curso", id, ": ", errorCurso.message);
+    
+        }
+        if (dataCurso) {
+          console.log("Data curso", id, ": ", dataCurso.getCursoById);
+          setId(dataCurso.getCursoById.id);
+          setNombre(dataCurso.getCursoById.nombre);
+          setDescripcion(dataCurso.getCursoById.descripcion);
+          setPrecio(dataCurso.getCursoById.precio);
+          setRating(dataCurso.getCursoById.rating);
+          setCategoria(dataCurso.getCursoById.categoria);
+          setNivel(dataCurso.getCursoById.nivel);
+          setInstructor(dataCurso.getCursoById.instructor);
+          setUrlImagen(dataCurso.getCursoById.urlImagen);
+        }
+      }, [dataCurso, loadingCurso, errorCurso]);
 
 
-
-export default function Curso({ id, nombre, categoria, descripcion, precio, instructor, urlimagen }) {
     const [focusedCardIndex, setFocusedCardIndex] = React.useState(null);
 
     const handleFocus = (index) => {
