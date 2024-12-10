@@ -251,12 +251,12 @@ export default function Curso({ id, nombre, categoria, descripcion, precio, inst
             </Modal>
 
             {/* SNACKBAR */}
-            <Snackbar open={openSnack} autoHideDuration={3000} onClose={handleSnackClose} 
+            <Snackbar open={openSnack} autoHideDuration={1000} onClose={handleSnackClose} 
             message="✅ Se añadió correctamente el curso!"
             
             />
 
-            <Snackbar open={openSnackerror} autoHideDuration={3000} onClose={handleSnackerrorClose} 
+            <Snackbar open={openSnackerror} autoHideDuration={1000} onClose={handleSnackerrorClose} 
             message="🚫 El curso ya esta en el carrito."
             
             /> 

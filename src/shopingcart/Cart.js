@@ -15,6 +15,7 @@ import TemplateFrame from "../checkout/TemplateFrame";
 import AppAppBar from "../Main/components/AppAppBar";
 import CursoCard from "./CursoCard";
 import { useNavigate } from "react-router-dom";
+import Snackbar from '@mui/material/Snackbar';
 // Apollo
 
 //MICROSERVICIO DE CARRITO
@@ -59,9 +60,10 @@ export default function Cart() {
   const [carritoId, setCarritoId] = React.useState(localStorage.getItem("carritoId"));
   const [carritoMonto, setCarritoMonto] = React.useState("");
   const [cursosEnCarrito, setCursosEnCarrito] = React.useState([]);
+  const [loginData, setLoginData] = React.useState(JSON.parse(localStorage.getItem("loginData")))
   //MUTACION PARA CREAR CARRITO
-  const [createCarrito,{ data: dataCarrito, loading: loadingCarrito, error: errorCarrito }] = useMutation(CREATE_CARRITO, { client: carritoClient },
-    {refetchQueries: [{query: GET_CURSOS_CARRITO, variables: {idCarrito: parseInt(carritoId)}}]});
+  const [createCarrito, { data: dataCarrito, loading: loadingCarrito, error: errorCarrito }] = useMutation(CREATE_CARRITO, { client: carritoClient },
+    { refetchQueries: [{ query: GET_CURSOS_CARRITO, variables: { idCarrito: parseInt(carritoId) } }] });
   React.useEffect(() => {
     if (loadingCarrito) {
       console.log("Loading carrito...");
@@ -76,6 +78,7 @@ export default function Cart() {
       setCarritoId(dataCarrito.createCarrito.id);
       localStorage.setItem("carritoId", dataCarrito.createCarrito.id);
       setCarritoMonto(dataCarrito.createCarrito.monto);
+      localStorage.setItem("montoCarrito",dataCarrito.createCarrito.monto)
       getCursosEnCarrito({
         variables: { idCarrito: dataCarrito.createCarrito.id },
       });
@@ -84,7 +87,7 @@ export default function Cart() {
 
   //MUTACION PARA CREAR CARRITO
   React.useEffect(() => {
-    const loginData = JSON.parse(localStorage.getItem("loginData"));
+    setLoginData(JSON.parse(localStorage.getItem("loginData")));
     console.log("Login data: ", loginData);
     if (loginData) {
       createCarrito({ variables: { idUsuario: loginData.id } });
@@ -100,7 +103,7 @@ export default function Cart() {
       data: dataCursosCarrito,
     },
   ] = useLazyQuery(GET_CURSOS_CARRITO, { client: carritoClient },
-    {refetchQueries: [{query: GET_CURSOS_CARRITO, variables: {idCarrito: parseInt(carritoId)}}]}
+    { refetchQueries: [{ query: GET_CURSOS_CARRITO, variables: { idCarrito: parseInt(carritoId) } }] }
   );
   React.useEffect(() => {
     if (loadingCursosCarrito) {
@@ -126,25 +129,48 @@ export default function Cart() {
   }, [dataCursosCarrito, loadingCursosCarrito, errorCursosCarrito]);
 
   React.useEffect(() => {
+    console.log("CARRITO ID", carritoId)
     console.log("Cursos en carrito: ", cursosEnCarrito);
   }, [cursosEnCarrito]);
 
+  React.useEffect(() => {
+    console.log("monto", localStorage.getItem("montoCarrito"))
+    setCarritoMonto(localStorage.getItem("montoCarrito"))
+  }, [localStorage.getItem("montoCarrito")]);
+
+
   //MANEJA LA ELIMINACION DE CURSOS EN EL CARRITO!
-//ACTUALIZAR CACHE! Falta eso
+  //ACTUALIZAR CACHE! Falta eso
+  const navigate = useNavigate();
+  const [openSnackeeliminado, setOpenSnackeliminado] = React.useState(false);
+  const handleSnackeliminadoClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSnackeliminado(false);
+  };
   const handleCursoEliminado = (idCurso) => {
     setCursosEnCarrito((prev) => prev.filter((curso) => curso.idCurso !== idCurso));
-    getCursosEnCarrito({
-      variables: { idCarrito: dataCarrito.createCarrito.id },
-    });
+    setOpenSnackeliminado(true)
+    navigate("/carrito")
   }
 
 
 
-  const navigate = useNavigate();
   const handlePagar = () => {
-    navigate("/checkout");
-  }
+   
+    if (localStorage.getItem("carritoID") == "0") {
+      console.log("Logueate para comprar")
+    } else if (localStorage.getItem("montoCarrito") !="0"){
+      console.log("Comprar!")
+      navigate("/checkout")
+    }else if (localStorage.getItem("montoCarrito") =="0"){
+      console.log("Agrega cursos para Pagar")
 
+    }
+  }
+  //SNACK
   //Themes
   const [mode, setMode] = React.useState("light");
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
@@ -213,7 +239,7 @@ export default function Cart() {
             >
               {cursosEnCarrito &&
                 cursosEnCarrito.map((curso) => (
-                  <CursoCard key={curso.idCurso} idCurso={curso.idCurso} onCursoEliminado={handleCursoEliminado}/>
+                  <CursoCard key={curso.idCurso} idCurso={curso.idCurso} onCursoEliminado={handleCursoEliminado} />
                 ))}
             </Box>
 
@@ -268,6 +294,7 @@ export default function Cart() {
               <Typography variant="h4" gutterBottom>
                 {carritoMonto}
               </Typography>
+
               <Button
                 variant="contained"
                 color="warning"
@@ -282,6 +309,9 @@ export default function Cart() {
             </Box>
           </Grid>
         </Grid>
+        <Snackbar open={openSnackeeliminado} autoHideDuration={1000} onClose={handleSnackeliminadoClose}
+          message=" ✅ Se ha eliminado el curso correctamente!"
+        />
       </ThemeProvider>
     </TemplateFrame>
   );

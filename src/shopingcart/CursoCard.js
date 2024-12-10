@@ -69,6 +69,7 @@ export default function CursoCard({idCurso, onCursoEliminado}) {
     }
     if (dataRemove) {
       console.log("Data remove curso", id, ": ", dataRemove.removeCurso);
+      localStorage.setItem("montoCarrito", parseFloat(localStorage.getItem("montoCarrito") - parseFloat(precio)))
       onCursoEliminado(idCurso);
     }
   }, [dataRemove, loadingRemove, errorRemove]);
