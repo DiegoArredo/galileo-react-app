@@ -48,9 +48,15 @@ export default function Profile() {
   const [loginData, setLoginData] = useState(
     JSON.parse(localStorage.getItem("loginData"))
   );
-
+  const [id, setId] = React.useState(loginData.id);
+  const [nombre, setNombre] = React.useState(loginData.nombre);
+  const[descripcion, setDescripcion] = React.useState(loginData.descripcion)
+  const[email, setEmail] = React.useState(loginData.email)
+  const[pais,setPais] = React.useState(loginData.pais)
+  const[genero,setGenero] = React.useState(loginData.genero)
   const [buttonDisabled, setButtonDisabled] = useState(true);
 
+  
   
   
   const validateUpdate = (event) => {
@@ -61,18 +67,35 @@ export default function Profile() {
       if (loginData[name] === null && value === "") {
         setButtonDisabled(true);
       } else {
+        
         setButtonDisabled(false);
+        if(name==="nombre"){
+          setNombre(value)
+        }else if(name==="descripcion"){
+          setDescripcion(value)
+        }else if(name==="email"){
+          setEmail(value)
+        }else if(name==="pais"){
+          setPais(value)
+        }else if(name==="genero"){
+          setGenero(value)
+        }
+
       }
     }
   };
+
+  
 
   const [updateUser, { data, loading, error }] = useMutation(UPDATE_USER, {client: userClient});
   useEffect(() => {
     if (loading) {
       console.log("Loading");
+      console.log(loading)
     }
     if (error) {
       console.log("Error");
+      console.log(error)
     }
     if (data) {
       console.log("Data");
@@ -85,16 +108,18 @@ export default function Profile() {
   }, [data, loading, error]);
 
   const handleSubmit = (event) => {
-    console.log("Submit");
-    
+    console.log("Submit, login data:");
+    console.log(loginData)
+    console.log("data front:")
+    console.log(id,nombre,email,descripcion,pais,genero)
     updateUser({
       variables: {
-        id: loginData.id,
-        nombre: loginData.nombre,
-        email: loginData.email,
-        descripcion: loginData.descripcion,
-        pais: loginData.pais,
-        genero: loginData.genero,
+        id: id,
+        nombre: nombre,
+        email: email,
+        descripcion: descripcion,
+        pais: pais,
+        genero: genero,
       },
     });
     event.preventDefault();
