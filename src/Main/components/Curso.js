@@ -7,8 +7,10 @@ import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import { Button, Divider } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import {Card, CardContent, CardActions} from "@mui/material"
+import { Card, CardContent, CardActions } from "@mui/material"
 import Modal from '@mui/material/Modal';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 //Apollo
 import { useQuery, gql, ApolloClient, InMemoryCache, useMutation } from "@apollo/client";
 const carritoClient = new ApolloClient({
@@ -39,10 +41,18 @@ const style = {
 };
 
 
-export default function Curso({ id, nombre, categoria, descripcion, precio, instructor, urlimagen, rating, nivel }) {
+export default function Curso({ id, nombre, categoria, descripcion, precio, instructor, urlimagen, rating, nivel}) {
+    // Para alerta de agregar curso
+    const [openSnack, setOpenSnack] = React.useState(false);
+    const [openSnackerror, setOpenSnackerror] = React.useState(false);
+    //
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+
+    //para array de cursos id
+
+
 
     const [carritoId, setCarritoId] = React.useState(localStorage.getItem("carritoId"));
     const [addCurso, { data, loading, error }] = useMutation(ADD_CURSO_CARRITO, { client: carritoClient });
@@ -51,17 +61,44 @@ export default function Curso({ id, nombre, categoria, descripcion, precio, inst
             console.log("Loading.. Adding curso ", id, "...");
         }
         if (error) {
-            console.log("Error adding curso ", id, ": ", error.message);
+            if (error.message =="El curso ya está en el carrito."){
+                setOpenSnackerror(true)
+            }
         }
         if (data) {
             console.log("Data adding curso", id, ":", data);
+            console.log("Open Snack de confirmación")
+            setOpenSnack(true)
+
         }
     }, [loading, error, data]);
 
+
+    //ADDING CURSO HANDLELING
     const handleAddingCurso = () => {
+        if (localStorage.getItem("carritoId") == "0"){
+            console.log("No hay carrito... logueate")
+        }else{
         addCurso({ variables: { idCarrito: parseInt(carritoId), idCurso: id } });
+        localStorage.setItem("carritoItems", parseInt(localStorage.getItem("carritoItems")) + 1)
+        }
+    };
+    
+    const handleSnackClose = (event, reason) => {
+    if (reason === 'clickaway') {
+        return;
+    }
+
+    setOpenSnack(false);
     };
 
+    const handleSnackerrorClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+    
+        setOpenSnackerror(false);
+        };
     const [focusedCardIndex, setFocusedCardIndex] = React.useState(null);
 
 
@@ -76,6 +113,7 @@ export default function Curso({ id, nombre, categoria, descripcion, precio, inst
     return (
 
         <Grid size={{ xs: 12, md: 4 }}>
+
             <SyledCard
                 variant="outlined"
                 onFocus={() => handleFocus(0)}
@@ -156,54 +194,54 @@ export default function Curso({ id, nombre, categoria, descripcion, precio, inst
                         <Typography gutterBottom variant="h4" component="div">
                             {nombre}
                         </Typography>
-                        <Divider/>
+                        <Divider />
                         <Typography gutterBottom variant="h6" component="div">
-                        Categoría: 
+                            Categoría:
                         </Typography>
                         <StyledTypography variant="subtitle1" color="text.secondary" gutterBottom>
                             {categoria}
                         </StyledTypography>
-                        <Divider/>
+                        <Divider />
 
                         <Typography gutterBottom variant="h6" component="div">
-                        Nivel: 
+                            Nivel:
                         </Typography>
                         <StyledTypography variant="subtitle1" color="text.secondary" gutterBottom>
                             {nivel}
                         </StyledTypography>
-                        <Divider/>
+                        <Divider />
 
                         <Typography gutterBottom variant="h6" component="div">
-                        Instructor: 
+                            Instructor:
                         </Typography>
                         <StyledTypography variant="subtitle1" color="text.secondary" gutterBottom>
                             {instructor}
                         </StyledTypography>
-                        <Divider/>
+                        <Divider />
 
                         <Typography gutterBottom variant="h6" component="div">
-                        Descripción: 
+                            Descripción:
                         </Typography>
                         <StyledTypography variant="subtitle1" color="text.secondary" gutterBottom>
                             {descripcion}
                         </StyledTypography>
-                        <Divider/>
+                        <Divider />
 
                         <Typography gutterBottom variant="h6" component="div">
-                        Rating: 
+                            Rating:
                         </Typography>
                         <StyledTypography variant="subtitle1" color="text.secondary" gutterBottom>
                             {rating}
                         </StyledTypography>
-                        <Divider/>
+                        <Divider />
 
                         <Typography gutterBottom variant="h6" component="div">
-                        Precio: 
+                            Precio:
                         </Typography>
                         <StyledTypography variant="subtitle1" color="text.secondary" gutterBottom>
-                           $ {precio} USD
+                            $ {precio} USD
                         </StyledTypography>
-                        
+
                     </SyledCardContent>
                     {/* <CardActions>
                         <Button size="small">Share</Button>
@@ -211,6 +249,19 @@ export default function Curso({ id, nombre, categoria, descripcion, precio, inst
                     </CardActions> */}
                 </Card>
             </Modal>
+
+            {/* SNACKBAR */}
+            <Snackbar open={openSnack} autoHideDuration={3000} onClose={handleSnackClose} 
+            message="✅ Se añadió correctamente el curso!"
+            
+            />
+
+            <Snackbar open={openSnackerror} autoHideDuration={3000} onClose={handleSnackerrorClose} 
+            message="🚫 El curso ya esta en el carrito."
+            
+            /> 
+                
+
         </Grid>
 
     )

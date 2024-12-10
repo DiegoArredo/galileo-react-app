@@ -58,8 +58,7 @@ export default function CursoCard({idCurso, onCursoEliminado}) {
   const [urlimagen, setUrlImagen] = React.useState("");
   const carritoId = localStorage.getItem("carritoId");
 
-  const [removeCurso,{loading:loadingRemove, error:errorRemove, data:dataRemove}] = useMutation(DELETE_CURSO_CARRITO, {client: carritoClient},
-    {refetchQueries: [{query: GET_CURSOS_CARRITO, variables: {idCarrito: parseInt(carritoId)}}]}
+  const [removeCurso,{loading:loadingRemove, error:errorRemove, data:dataRemove}] = useMutation(DELETE_CURSO_CARRITO, {client: carritoClient}
   );
   React.useEffect(() => {
     if (loadingRemove) {

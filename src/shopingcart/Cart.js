@@ -56,11 +56,12 @@ export const GET_CURSOS_CARRITO = gql`
 `;
 
 export default function Cart() {
-  const [carritoId, setCarritoId] = React.useState(0);
+  const [carritoId, setCarritoId] = React.useState(localStorage.getItem("carritoId"));
   const [carritoMonto, setCarritoMonto] = React.useState("");
   const [cursosEnCarrito, setCursosEnCarrito] = React.useState([]);
   //MUTACION PARA CREAR CARRITO
-  const [createCarrito,{ data: dataCarrito, loading: loadingCarrito, error: errorCarrito }] = useMutation(CREATE_CARRITO, { client: carritoClient });
+  const [createCarrito,{ data: dataCarrito, loading: loadingCarrito, error: errorCarrito }] = useMutation(CREATE_CARRITO, { client: carritoClient },
+    {refetchQueries: [{query: GET_CURSOS_CARRITO, variables: {idCarrito: parseInt(carritoId)}}]});
   React.useEffect(() => {
     if (loadingCarrito) {
       console.log("Loading carrito...");
@@ -98,7 +99,9 @@ export default function Cart() {
       error: errorCursosCarrito,
       data: dataCursosCarrito,
     },
-  ] = useLazyQuery(GET_CURSOS_CARRITO, { client: carritoClient });
+  ] = useLazyQuery(GET_CURSOS_CARRITO, { client: carritoClient },
+    {refetchQueries: [{query: GET_CURSOS_CARRITO, variables: {idCarrito: parseInt(carritoId)}}]}
+  );
   React.useEffect(() => {
     if (loadingCursosCarrito) {
       console.log("Loading cursos carrito...");
@@ -130,7 +133,13 @@ export default function Cart() {
 //ACTUALIZAR CACHE! Falta eso
   const handleCursoEliminado = (idCurso) => {
     setCursosEnCarrito((prev) => prev.filter((curso) => curso.idCurso !== idCurso));
+    getCursosEnCarrito({
+      variables: { idCarrito: dataCarrito.createCarrito.id },
+    });
   }
+
+
+
   const navigate = useNavigate();
   const handlePagar = () => {
     navigate("/checkout");

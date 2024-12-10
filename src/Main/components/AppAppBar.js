@@ -62,9 +62,14 @@ export default function AppAppBar() {
     navigate("/carrito");
   };
   const [carritoCantidad, setCarritoCantidad] = React.useState(localStorage.getItem("carritoItems"));
+  
+  
   React.useEffect(() => {
     setCarritoCantidad(localStorage.getItem("carritoItems"));
+    
   }, [localStorage.getItem("carritoItems")]);
+
+
   return (
     <AppBar
       position="fixed"
@@ -137,8 +142,8 @@ export default function AppAppBar() {
               alignItems: "center",
             }}
           >
-            <IconButton aria-label="cart"  onClick={handleCarrito}>
-              <Badge badgeContent={carritoCantidad} color="warning">
+            <IconButton aria-label="cart"  href="carrito" >
+              <Badge badgeContent={"C"} color="warning">
                 <ShoppingCartIcon />
               </Badge>
             </IconButton>
