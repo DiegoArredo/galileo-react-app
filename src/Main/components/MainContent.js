@@ -86,6 +86,8 @@ export default function MainContent() {
             precio={curso.precio}
             instructor={curso.instructor}
             urlimagen={curso.urlImagen}
+            rating={curso.rating}
+            nivel={curso.nivel}
           />
         ))}
 
