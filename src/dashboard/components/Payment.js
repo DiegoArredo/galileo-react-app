@@ -10,7 +10,6 @@ import Typography from '@mui/material/Typography';
 import Button from "@mui/material/Button"
 import { useNavigate } from "react-router-dom";
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 
 //MICROSERVICIO DE CARRITO
 import {
@@ -47,7 +46,6 @@ export default function Payment() {
     const navigate = useNavigate();
     const [finalizarCarrito, { data: dataFinalizar, loading: loadingFinalizar, error: errorFinalizar }] = useMutation(FINALIZAR_CARRITO, { client: carritoClient });
     console.log(parseInt(localStorage.getItem("carritoId")))
-
     React.useEffect(() => {
         if (loadingFinalizar) {
             console.log("Loading Finalizar...");
@@ -69,53 +67,8 @@ export default function Payment() {
     React.useEffect(() => {
         if (status === "succes"){
             finalizarCarrito({variables: {idCarrito: parseInt(localStorage.getItem("carritoId"))}})
-            .then(response => {
-                const idUsuario = response.data.finalizarCarrito.idUsuario;
-                fetchUserEmail(idUsuario);
-            })
-            .catch(error => {
-                console.error("Error finalizando el carrito:", error);
-            });
-    
         }
     }, [status]);
-
-    const fetchUserEmail = async (idUsuario) => {
-        try {
-            const response = await axios.post('http://localhost:3001/graphql', {
-                query: `
-                    query getUserById($id: Int!) {
-                        getUserById(id: $id) {
-                            email
-                        }
-                    }
-                `,
-                variables: {
-                    id: idUsuario
-                }
-            });
-            const userEmail = response.data.data.getUserById.email;
-            const courses = JSON.parse(localStorage.getItem("carritoItems")).map(item => item.nombre);
-            const totalAmount = localStorage.getItem("montoCarrito");
-            sendNotification(userEmail, courses, totalAmount);
-        } catch (error) {
-            console.error('Error fetching user email:', error);
-        }
-    };
-
-    const sendNotification = async (userEmail, courses, totalAmount) => {
-        const summary = `Cursos: ${courses.join(', ')}, Total: $${totalAmount}`;
-        
-        try {
-            const response = await axios.post('http://localhost:8080/notify', {
-                user_email: userEmail,
-                summary: summary
-            });
-            console.log('Email sent successfully:', response.data);
-        } catch (error) {
-            console.error('Failed to send email:', error);
-        }
-    };
 
 
     const handlegotoorders = () => {
