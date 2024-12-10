@@ -11,6 +11,7 @@ import Button from "@mui/material/Button"
 import { useNavigate } from "react-router-dom";
 import { useParams } from 'react-router-dom';
 
+
 //MICROSERVICIO DE CARRITO
 import {
     useQuery,
@@ -77,8 +78,45 @@ export default function Payment() {
     const handlegotocheckout = () => {
         navigate("/checkout");
     }
+
+    const notifyPurchase = async (email,idCarrito,cantidadCursos) => {
+        const purchaseData = {
+          user_email: email,
+          summary: "Se ha confirmado la compra con N° #" + idCarrito + " por un total de " + cantidadCursos + " cursos. Gracias por tu compra! :)",
+        };
+      
+        try {
+          const response = await fetch("http://localhost:3005/notify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(purchaseData),
+          });
+      
+          if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+          }
+      
+          const result = await response.text();
+          console.log(result); // "Email sent successfully"
+         
+        } catch (error) {
+          console.error("Error al enviar la notificación:", error);
+          
+        }
+      };
+
+
+
+
+
     if (status === "succes") {
+        // console.log(JSON.parse(localStorage.getItem("loginData")).email)
+        // console.log(localStorage.getItem("carritoId"))
+        // console.log(localStorage.getItem("carritoItems"))
         
+        notifyPurchase(JSON.parse(localStorage.getItem("loginData")).email, localStorage.getItem("carritoId"), localStorage.getItem("carritoItems"))
         return (
             <Stack spacing={2} useFlexGap pt={"8vh"}>
                 <Typography variant="h1">📦</Typography>
