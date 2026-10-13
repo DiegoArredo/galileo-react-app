@@ -2,13 +2,13 @@
 
 > Frontend desarrollado por **Diego Arredondo** para la plataforma educativa Galileo de la Escuela de Ingeniería de la Universidad Católica del Norte (UCN).
 
-## Descripción
+## 🚀 Descripción
 
 Galileo Frontend es una SPA construida con **React 18** para una plataforma de cursos online. Implementa el catálogo, autenticación, perfil de usuario, carrito, checkout con Webpay, historial de compras y un chatbot conectado al servicio de IA.
 
 La aplicación se comunica con los microservicios mediante **GraphQL**, utiliza **Apollo Client** para las consultas y **Material UI** para construir una interfaz responsive con temas claro y oscuro.
 
-## Funcionalidades principales
+## 🎯 Funcionalidades principales
 
 - Catálogo de cursos con información de precio, categoría, nivel, instructor, rating e imagen.
 - Registro e inicio de sesión con validación de formularios.
@@ -22,7 +22,7 @@ La aplicación se comunica con los microservicios mediante **GraphQL**, utiliza 
 - Integración con Webpay para iniciar transacciones.
 - Chatbot con historial de mensajes y `sessionId` para mantener el contexto.
 
-## Arquitectura
+## 🏗️ Arquitectura
 
 La aplicación está organizada por dominios para mantener cada funcionalidad aislada y facilitar la reutilización de componentes:
 
@@ -40,7 +40,7 @@ src/
 └── index.css              # Estilos globales
 ```
 
-## Rutas principales
+## 🌐 Rutas principales
 
 | Ruta | Funcionalidad |
 |---|---|
@@ -55,7 +55,7 @@ src/
 
 Las rutas se administran con `BrowserRouter`, `Routes`, `Route` y `useNavigate` de React Router.
 
-## Integración con el backend
+## 🔌 Integración con el backend
 
 Apollo Client utiliza clientes independientes para dirigir cada operación al microservicio correspondiente:
 
@@ -69,7 +69,7 @@ Apollo Client utiliza clientes independientes para dirigir cada operación al mi
 
 Se utilizan `useQuery` para datos necesarios al cargar una vista, `useLazyQuery` para consultas bajo demanda y `useMutation` para crear o actualizar información.
 
-## React aplicado y decisiones técnicas
+## ⚛️ React aplicado y decisiones técnicas
 
 - **Componentes funcionales:** las pantallas se dividen en componentes pequeños y reutilizables, como tarjetas de curso, formularios, menús, tarjetas del dashboard y secciones del checkout.
 - **`useState`:** administra estado local como formularios, errores, modo visual, paso activo del checkout, diálogo del chatbot y mensajes.
@@ -83,7 +83,7 @@ Se utilizan `useQuery` para datos necesarios al cargar una vista, `useLazyQuery`
 
 La optimización se centra en separar responsabilidades, reutilizar componentes y ejecutar consultas solo cuando son necesarias. No se añade memoización indiscriminadamente: `useMemo` y `useCallback` deben incorporarse cuando exista un cálculo costoso o una necesidad concreta de evitar renders.
 
-## Flujo de compra
+## 🛒 Flujo de compra
 
 ```text
 Catálogo
@@ -95,7 +95,7 @@ Catálogo
   → Redirigir a Webpay
 ```
 
-## Instalación y ejecución
+## ⚡ Instalación y ejecución
 
 Requisitos: Node.js, npm y los microservicios del backend disponibles.
 
